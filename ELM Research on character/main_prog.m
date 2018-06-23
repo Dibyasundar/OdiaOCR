@@ -1,15 +1,30 @@
 clear;clc;close all;
-delete Result_analysis.xlsx;
-Lang={'English_num_MNIST','Bangla_num_NITRKL','Odia_num_IIITBBS','Bangla_num_ISIKOL','Odia_num_ISIKOL'};
-h_node=[4000];
+%% Initialisation of POI Libs
+% Add Java POI Libs to matlab javapath
+if isunix
+    javaaddpath('../datasets/poi_library/poi-3.8-20120326.jar');
+    javaaddpath('../datasets/poi_library/poi-ooxml-3.8-20120326.jar');
+    javaaddpath('../datasets/poi_library/poi-ooxml-schemas-3.8-20120326.jar');
+    javaaddpath('../datasets/poi_library/xmlbeans-2.3.0.jar');
+    javaaddpath('../datasets/poi_library/dom4j-1.6.1.jar');
+    javaaddpath('../datasets/poi_library/stax-api-1.0.1.jar');
+end
+
+%%%main code
+
+
+Lang={'English_num_MNIST','Bangla_num_NITRKL'};%,'Odia_num_IIITBBS','Bangla_num_ISIKOL','Odia_num_ISIKOL'};
+h_node=[4];
 h_rand={'relu','ortho'};
 h_acti={'Relu','LeakyRelu','Gaussian'};
-% for ix=1:size(h_actii,2)
-%     h_acti={h_actii{ix}};
     h_dev=[80];
     run=1;
     for ilt=1:size(Lang,2)
-        full_data=load(strcat(Lang{ilt},'\Data_file.mat'));
+        if isunix
+            full_data=load(strcat('../datasets/',Lang{ilt},'/Data_file.mat'));
+        elseif ispc
+            full_data=load(strcat('..\datasets\',Lang{ilt},'\Data_file.mat'));
+        end
         full_data.cls=full(ind2vec((full_data.cls+1)'))';
         clear result;
         kt=1;
@@ -36,5 +51,9 @@ h_acti={'Relu','LeakyRelu','Gaussian'};
         end
         f={'Activation function','Rand Intialization','Number of Node','Training Testing Ratio','Training Accuracy','Train_var','Testing Accuracy','Test_var'};
         result=[f;result];
-        xlswrite(strcat('Result_analysis_final_20_june_mult','.xlsx'),result,strcat(Lang{ilt}),'A1')
+        if isunix
+            xlwrite(strcat('Result_analysis_4.xls'),result,strcat(Lang{ilt}),'A1');
+        elseif ispc
+            xlswrite(strcat('Result_analysis_4.xls'),result,strcat(Lang{ilt}),'A1');
+        end
     end
